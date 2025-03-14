@@ -2,7 +2,7 @@
 
 // Pin definitions
 const int soundSensorPin = A0;    // Sound sensor on A0
-const int ldrPin = A1;            // LDR sensor on A1
+const int ldrPin = D1;            // LDR sensor on A1
 const int buzzerPin = 9;          // Buzzer on digital pin 9 (PWM for tone)
 const int ledPin = 10;            // LED on digital pin 10
 

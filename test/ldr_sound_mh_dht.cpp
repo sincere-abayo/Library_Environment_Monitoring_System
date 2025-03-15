@@ -81,6 +81,8 @@ void controlLighting() {
   Serial.print(lightLevel);
   Serial.print(" || ");
 }
+
+
 void readEnvironmentData() {
   float humidity = dht.readHumidity();
   float temperature = dht.readTemperature();
@@ -112,8 +114,7 @@ void setup() {
 }
 
 void loop() {
-  // Handle lighting control
-  controlLighting();
+
   
   // Read temperature and humidity
   readEnvironmentData();

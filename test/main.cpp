@@ -8,16 +8,16 @@
 #include <Wire.h>
 
 // WiFi credentials
-const char* ssid = "bjaynet";
-const char* password = "bjay1010..";
+const char* ssid = "Gihanga Dynamics";
+const char* password = "gihanga@2025";
 
 // LCD setup (0x27 is the default I2C address, adjust if needed)
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 // Server details
-const char* serverName = "http://192.168.43.50/library_monitoring_system/api/add_sensor_data.php";
-const char* getModeUrl = "http://192.168.43.50/library_monitoring_system/api/get_mode.php";
-const char* getControlUrl = "http://192.168.43.50/library_monitoring_system/api/get_control.php";
+const char* serverName = "http://192.168.88.192/library_monitoring_system/api/add_sensor_data.php";
+const char* getModeUrl = "http://192.168.88.192/library_monitoring_system/api/get_mode.php";
+const char* getControlUrl = "http://192.168.88.192/library_monitoring_system/api/get_control.php";
 
 // Pin definitions
 const int soundSensorPin = D0;    // Sound sensor
@@ -26,10 +26,10 @@ const int ldrPin = A0;            // LDR sensor
 const int mq8DigitalPin = D6;     // MQ-8 digital pin
 const int DHTPIN = D4;            // DHT22
 const int buzzerPin = D5;         // Buzzer
-const int ledPin = D8;            // LED
+const int ledPin = D3;            // LED
 const int relayPin = D7;          // Relay for fan
 
-#define DHTTYPE DHT22
+#define DHTTYPE DHT11
 DHT dht(DHTPIN, DHTTYPE);
 
 // System parameters
@@ -50,9 +50,11 @@ const int soundAlertTones[] = {2000, 1500, 2000, 1500, 2000};
 const int soundAlertDurations[] = {200, 200, 200, 200, 500};
 const int numSoundAlertTones = 5;
 
-const int gasAlertTones[] = {3000, 2500, 3000, 2500, 3000, 2500, 3000};
-const int gasAlertDurations[] = {150, 150, 150, 150, 150, 150, 500};
-const int numGasAlertTones = 7;
+// Replace lines 53-55 with:
+const int gasAlertTones[] = {440, 880, 440, 880, 440, 880, 440, 880};  // Alternating low-high pattern like ambulance
+const int gasAlertDurations[] = {400, 400, 400, 400, 400, 400, 400, 400};  // Equal durations for wailing effect
+const int numGasAlertTones = 8;  // Updated to match the new array size
+
 
 void playManualAlarm();
 void  checkManualAlarm();
@@ -281,17 +283,30 @@ void playGasAlert() {
   lcd.setCursor(0, 1);
   lcd.print("EVACUATE AREA!");
   
-  // Play urgent alert pattern 5 times for gas detection
-  for (int repeat = 0; repeat < 5; repeat++) {
-    for (int i = 0; i < numGasAlertTones; i++) {
-      tone(buzzerPin, gasAlertTones[i]);
-      delay(gasAlertDurations[i]);
-      noTone(buzzerPin);
-      delay(30);  // Shorter pause for more urgent feel
+  // Play ambulance-like siren pattern
+  for (int repeat = 0; repeat < 4; repeat++) {
+    // Rising pitch (ambulance approaching sound)
+    for (int pitch = 440; pitch < 880; pitch += 20) {
+      tone(buzzerPin, pitch);
+      delay(15);
     }
-    delay(200);  // Shorter pause between repetitions for urgency
+    
+    // Falling pitch (ambulance departing sound)
+    for (int pitch = 880; pitch > 440; pitch -= 20) {
+      tone(buzzerPin, pitch);
+      delay(15);
+    }
   }
   
+  // Play the defined pattern once more
+  for (int i = 0; i < numGasAlertTones; i++) {
+    tone(buzzerPin, gasAlertTones[i]);
+    delay(gasAlertDurations[i]);
+    noTone(buzzerPin);
+    delay(20);
+  }
+  
+  noTone(buzzerPin);  // Ensure tone is off when done
   isAlertActive = false;
 }
 
